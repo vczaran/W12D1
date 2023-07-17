@@ -12,10 +12,11 @@ function Autocomplete (props) {
   useEffect ( () => {
     if (showList) {
       document.addEventListener('click', handleOutsideClick);
-    } else {
-      console.log("Removing Autocomplete listener on update!");
-      document.removeEventListener('click', handleOutsideClick);
     };
+    // else {
+    //   console.log("Removing Autocomplete listener on update!");
+    //   document.removeEventListener('click', handleOutsideClick);
+    // };
 
     return ( () => {
       console.log("Cleaning up event listener from Autocomplete!");
