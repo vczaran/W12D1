@@ -27,6 +27,7 @@ function Weather (props) {
       Also remember to restart your server (i.e., re-run "npm start") whenever
       you change your .env file. */
       const apiKey = process.env.REACT_APP_WEATHER_API;
+      // const apiKey = null;
 
       const params = {
         lat: location.coords.latitude,
