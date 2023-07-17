@@ -1,48 +1,61 @@
-import React from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { CSSTransition, TransitionGroup } from 'react-transition-group';
 
-class Autocomplete extends React.Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      inputVal: '',
-      showList: false
-    };
-    this.inputRef = React.createRef();
-  }
+function Autocomplete (props) {
+  const [inputVal, setInputVal] = useState("");
+  const [showList, setShowList] = useState(false);
+  const inputRef = useRef();
 
-  componentDidUpdate() {
-    if (this.state.showList) {
-      document.addEventListener('click', this.handleOutsideClick);
+
+  // this.inputRef = React.createRef();
+
+  useEffect ( () => {
+    if (showList) {
+      document.addEventListener('click', handleOutsideClick);
     } else {
       console.log("Removing Autocomplete listener on update!");
-      document.removeEventListener('click', this.handleOutsideClick);
-    }
+      document.removeEventListener('click', handleOutsideClick);
+    };
+
+    return ( () => {
+      console.log("Cleaning up event listener from Autocomplete!");
+      document.removeEventListener('click', handleOutsideClick);
+    })
+  }, [showList])
+
+  // componentDidUpdate() {
+  //   if (showList) {
+  //     document.addEventListener('click', handleOutsideClick);
+  //   } else {
+  //     console.log("Removing Autocomplete listener on update!");
+  //     document.removeEventListener('click', handleOutsideClick);
+  //   }
+  // }
+
+  // componentWillUnmount () {
+  //   console.log("Cleaning up event listener from Autocomplete!");
+  //   document.removeEventListener('click', handleOutsideClick);
+  // }
+
+  const handleInput = (e) => {
+    setInputVal(e.target.value);
   }
 
-  componentWillUnmount () {
-    console.log("Cleaning up event listener from Autocomplete!");
-    document.removeEventListener('click', this.handleOutsideClick);
-  }
-
-  handleInput = (e) => {
-    this.setState({ inputVal: e.target.value });
-  }
-
-  selectName = e => {
+  const selectName = e => {
     e.stopPropagation();
-    this.setState({ inputVal: e.target.innerHTML, showList: false });
+    setInputVal(e.target.innerHTML);
+    setShowList(false);
   }
 
-  handleOutsideClick = () => {
+  const handleOutsideClick = () => {
     // Leave dropdown visible as long as input is focused
-    if (document.activeElement === this.inputRef.current) return;
-    else this.setState({ showList: false });
+    if (document.activeElement === inputRef.current) return;
+    else setShowList(false);
   }
 
-  matches = () => {
-    const { inputVal } = this.state;
-    const { names } = this.props;
+  const matches = () => {
+    // const { inputVal } = this.state;
+    const { names } = props;
     const inputLength = inputVal.length;
     const matches = [];
 
@@ -60,9 +73,8 @@ class Autocomplete extends React.Component {
     return matches;
   }
 
-  render() {
-    const results = this.matches().map((result) => {
-      const nodeRef = React.createRef();
+    const results = matches().map((result) => {
+    const nodeRef = React.createRef();
       return (
         <CSSTransition
           nodeRef={nodeRef}
@@ -70,7 +82,7 @@ class Autocomplete extends React.Component {
           classNames="result"
           timeout={{ enter: 500, exit: 300 }}
         >
-          <li ref={nodeRef} className="nameLi" onClick={this.selectName}>
+          <li ref={nodeRef} className="nameLi" onClick={selectName}>
             {result}
           </li>
         </CSSTransition>
@@ -83,12 +95,12 @@ class Autocomplete extends React.Component {
         <div className="auto">
           <input
             placeholder="Search..."
-            ref={this.inputRef}
-            onChange={this.handleInput}
-            value={this.state.inputVal}
-            onFocus={() => this.setState({ showList: true })}
+            ref={inputRef}
+            onChange={handleInput}
+            value={inputVal}
+            onFocus={() => setShowList(true)}
           />
-          {this.state.showList && (
+          {showList && (
             <ul className="auto-dropdown">
               <TransitionGroup>
                 {results}
@@ -99,6 +111,6 @@ class Autocomplete extends React.Component {
       </section>
     );
   }
-}
+
 
 export default Autocomplete;
